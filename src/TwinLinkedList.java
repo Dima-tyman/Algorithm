@@ -1,6 +1,7 @@
 import java.util.Arrays;
 import java.util.Comparator;
 
+
 public class TwinLinkedList<E> {
 
     private int size;
@@ -10,12 +11,15 @@ public class TwinLinkedList<E> {
 
     public void addFirst(E value) {
         Node<E> newNode = new Node<>(value);
-        if (head != null) {
-            newNode.next = head;
-            head.previous = newNode;
+        if (head == null) {
+            head = newNode;
+            last = newNode;
+            size++;
+            return;
         }
+        head.previous = newNode;
+        newNode.next = head;
         head = newNode;
-        last = newNode;
         size++;
     }
 
@@ -50,14 +54,13 @@ public class TwinLinkedList<E> {
             return;
         }
         last.previous.next = null;
-        last = null;
+        last = last.previous;
         size--;
     }
 
     public Node<E> find(E value) {
-        if (head == null) return null;
         Node<E> currentNode = head;
-        while (currentNode.next != null) {
+        while (currentNode != null) {
             if (currentNode.value == value) return currentNode;
             currentNode = currentNode.next;
         }
@@ -66,6 +69,24 @@ public class TwinLinkedList<E> {
 
     public boolean contain(E value) {
         return find(value) != null;
+    }
+
+    public void reverse() {
+        if (head == null || head == last) return;
+
+        head.previous = head.next;
+        head.next = null;
+        Node<E> currentNode = head.previous;
+        Node<E> nextNode = currentNode.next;
+        while (nextNode != null) {
+            currentNode.next = currentNode.previous;
+            currentNode.previous = nextNode;
+            currentNode = nextNode;
+            nextNode = nextNode.next;
+        }
+        last.next = last.previous;
+        last = head;
+        head = currentNode;
     }
 
     public void sort(Comparator<? super E> c) {
@@ -78,19 +99,33 @@ public class TwinLinkedList<E> {
         }
         Arrays.sort(arr, (Comparator<Object>) c);
 
-        head = (Node) arr[0];
-        head.next = (Node) arr[1];
-        last = (Node) arr[-1];
-        last.previous = (Node) arr[-2];
+        head = (Node<E>) arr[0];
+        head.next = (Node<E>) arr[1];
+        last = (Node<E>) arr[-1];
+        last.previous = (Node<E>) arr[-2];
 
         currentNode = head.next;
         for (int i = 1; i < size - 1; i++) {
-            currentNode.previous = (Node) arr[i - 1];
-            currentNode = (Node) arr[i];
-            currentNode.next = (Node) arr[i + 1];
+            currentNode.previous = (Node<E>) arr[i - 1];
+            currentNode = (Node<E>) arr[i];
+            currentNode.next = (Node<E>) arr[i + 1];
             currentNode = currentNode.next;
         }
     }
+
+
+    public int getSize() {
+        return size;
+    }
+
+    public Node<E> getHead() {
+        return head;
+    }
+
+    public Node<E> getLast() {
+        return last;
+    }
+
 
     static class Node<T> {
         public T value;
