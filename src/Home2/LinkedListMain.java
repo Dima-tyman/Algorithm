@@ -1,3 +1,5 @@
+package Home2;
+
 import java.util.Random;
 
 public class LinkedListMain {
